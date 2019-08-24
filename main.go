@@ -9,6 +9,8 @@ import (
 	"github.com/Girbons/effective-potato/pkg/handler"
 	"github.com/Girbons/effective-potato/pkg/middleware"
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
+	"github.com/stianeikeland/go-rpio"
 )
 
 func main() {
@@ -25,6 +27,12 @@ func main() {
 		os.Exit(0)
 	}
 
+	if err := rpio.Open(); err != nil {
+		log.Error(err)
+		os.Exit(1)
+	}
+	defer rpio.Close()
+
 	router := mux.NewRouter()
 	// user endpoints
 	router.HandleFunc("/login/", userHandlers.Login).Methods("POST")
@@ -35,7 +43,7 @@ func main() {
 	router.Handle("/api/pin/on/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinON))).Methods("POST")
 	router.Handle("/api/pin/off/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinOFF))).Methods("POST")
 	router.Handle("/api/pin/status/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinStatus))).Methods("GET")
-	router.Handle("/api/temperature-sensor/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.ReadTemperature))).Methods("GET")
+	router.Handle("/api/temperature-sensor/{pin:[0-9]+}/{dht}/", middleware.AuthMiddleware(http.HandlerFunc(handler.ReadTemperature))).Methods("GET")
 
 	http.ListenAndServe(":8080", router)
 }

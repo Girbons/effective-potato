@@ -66,7 +66,6 @@ func (user *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user.db.Where("username = ?", username).First(&u).Count(&count)
-	fmt.Println("count", count)
 	if count == 0 {
 		respondWithError(w, http.StatusBadRequest, "invalid username or password")
 	}

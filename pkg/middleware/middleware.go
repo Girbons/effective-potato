@@ -24,9 +24,9 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			w.Write([]byte("Error verifying JWT token: " + err.Error()))
 			return
 		}
-		name := claims.(jwt.MapClaims)["name"].(string)
+		username := claims.(jwt.MapClaims)["username"].(string)
 
-		r.Header.Set("name", name)
+		r.Header.Set("username", username)
 		next.ServeHTTP(w, r)
 	})
 }

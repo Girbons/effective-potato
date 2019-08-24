@@ -1,19 +1,18 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/Girbons/effective-potato/pkg/device"
 	"github.com/Girbons/effective-potato/pkg/sensor"
+	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
 
 func PinON(w http.ResponseWriter, r *http.Request) {
-	params := r.URL.Query()
-
-	pin := params.Get("pin")
+	vars := mux.Vars(r)
+	pin := vars["pin"]
 
 	if pin == "" {
 		respondWithError(w, http.StatusBadRequest, "Pin is required")
@@ -22,13 +21,12 @@ func PinON(w http.ResponseWriter, r *http.Request) {
 	parsedPin, _ := strconv.Atoi(pin)
 	device.On(parsedPin)
 
-	respondWithJSON(w, http.StatusOK, fmt.Sprintf("pin set to on"))
+	respondWithJSON(w, http.StatusOK, map[string]string{"status": "pin ON"})
 }
 
 func PinOFF(w http.ResponseWriter, r *http.Request) {
-	params := r.URL.Query()
-
-	pin := params.Get("pin")
+	vars := mux.Vars(r)
+	pin := vars["pin"]
 
 	if pin == "" {
 		respondWithError(w, http.StatusBadRequest, "Pin is required")
@@ -37,13 +35,12 @@ func PinOFF(w http.ResponseWriter, r *http.Request) {
 	parsedPin, _ := strconv.Atoi(pin)
 	device.Off(parsedPin)
 
-	respondWithJSON(w, http.StatusOK, fmt.Sprintf("pin set to off"))
+	respondWithJSON(w, http.StatusOK, map[string]string{"status": "pin OFF"})
 }
 
 func PinStatus(w http.ResponseWriter, r *http.Request) {
-	params := r.URL.Query()
-
-	pin := params.Get("pin")
+	vars := mux.Vars(r)
+	pin := vars["pin"]
 
 	if pin == "" {
 		respondWithError(w, http.StatusBadRequest, "Pin is required")
@@ -52,16 +49,17 @@ func PinStatus(w http.ResponseWriter, r *http.Request) {
 	parsedPin, _ := strconv.Atoi(pin)
 	status := device.Status(parsedPin)
 
-	respondWithJSON(w, http.StatusOK, fmt.Sprintf("status %s", status))
+	respondWithJSON(w, http.StatusOK, map[string]string{"status": status})
 }
 
 func ReadTemperature(w http.ResponseWriter, r *http.Request) {
 	retryTimes := 1
 
 	params := r.URL.Query()
+	vars := mux.Vars(r)
+	pin := vars["pin"]
 
-	pin := params.Get("pin")
-	dhtType := params.Get("dht")
+	dhtType := vars["dht"]
 	retryTimesParam := params.Get("retryTimes")
 
 	if pin == "" || dhtType == "" {
@@ -74,7 +72,7 @@ func ReadTemperature(w http.ResponseWriter, r *http.Request) {
 	}
 
 	parsedPin, _ := strconv.Atoi(pin)
-	temperature, humidity, _, err := sensor.ReadTemperature(parsedPin, dhtType, retryTimes)
+	temperature, humidity, _, err := sensor.ReadTemperature(dhtType, parsedPin, retryTimes)
 
 	if err != nil {
 		log.Error(err)

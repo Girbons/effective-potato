@@ -1,0 +1,2 @@
+# Remember to change this
+jwt_signing_key: "example-key"

@@ -10,8 +10,6 @@ func On(pin int) {
 	if status != rpio.High {
 		p.High()
 	}
-
-	rpio.Close()
 }
 
 func Off(pin int) {
@@ -20,8 +18,6 @@ func Off(pin int) {
 	if status != rpio.Low {
 		p.Low()
 	}
-
-	rpio.Close()
 }
 
 func pinStatus(pin int) (rpio.Pin, rpio.State) {
@@ -31,7 +27,17 @@ func pinStatus(pin int) (rpio.Pin, rpio.State) {
 }
 
 func Status(pin int) string {
+	var humanStatus string
 	_, status := pinStatus(pin)
 
-	return string(status)
+	switch status {
+	case rpio.Low:
+		humanStatus = "Low"
+	case rpio.High:
+		humanStatus = "High"
+	default:
+		humanStatus = "Unkwown"
+	}
+
+	return humanStatus
 }
