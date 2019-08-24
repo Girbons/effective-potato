@@ -7,10 +7,7 @@ import (
 )
 
 func migrateModels(db *gorm.DB) {
-	db.AutoMigrate(&models.Light{})
 	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Fan{})
-	db.AutoMigrate(&models.Room{})
 }
 
 // InitDB will initialize the database and returns a DB connection

@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/Girbons/effective-potato/pkg/config"
-	"github.com/Girbons/effective-potato/pkg/handlers"
+	"github.com/Girbons/effective-potato/pkg/handler"
 	"github.com/Girbons/effective-potato/pkg/middleware"
 	"github.com/gorilla/mux"
 )
@@ -14,49 +14,28 @@ import (
 func main() {
 	createAdminUser := flag.Bool("create-admin-user", false, "Create Admin user")
 	adminPassword := flag.String("admin-password", "dev123456", "choose admin password")
-
 	flag.Parse()
 
-	router := mux.NewRouter()
-	// db initialization
 	db := config.InitDB()
+	defer db.Close()
 
-	userHandlers := handlers.NewUserHandler(db)
+	userHandlers := handler.NewUserHandler(db)
 	if *createAdminUser {
 		userHandlers.CreateAdminUser(*adminPassword)
-		os.Exit(2)
+		os.Exit(0)
 	}
 
-	lightHandler := handlers.NewLightHandler(db)
-
+	router := mux.NewRouter()
 	// user endpoints
 	router.HandleFunc("/login/", userHandlers.Login).Methods("POST")
 	router.HandleFunc("/logout/", userHandlers.Logout).Methods("POST")
 
 	router.Handle("/api/user/add/", middleware.AuthMiddleware(http.HandlerFunc(userHandlers.AddUser))).Methods("POST")
 
-	// lights endpoints
-	router.Handle("/api/lights/list/", middleware.AuthMiddleware(http.HandlerFunc(lightHandler.List))).Methods("GET")
-	router.Handle("/api/lights/add/", middleware.AuthMiddleware(http.HandlerFunc(lightHandler.Add))).Methods("POST")
-	router.Handle("/api/lights/{id}/detail/", middleware.AuthMiddleware(http.HandlerFunc(lightHandler.Detail))).Methods("GET")
-	router.Handle("/api/lights/{id}/detail/", middleware.AuthMiddleware(http.HandlerFunc(lightHandler.Detail))).Methods("POST")
-	router.Handle("/api/lights/{id}/detail/", middleware.AuthMiddleware(http.HandlerFunc(lightHandler.Detail))).Methods("DELETE")
-
-	// fan endpoints
-	//router.Handle("/api/fan/{id}/detail/", middleware.AuthMiddleware(http.HandlerFunc(fansHandler.Detail))).Methods("DELETE")
-	//router.Handle("/api/fan/list/", middleware.AuthMiddleware(http.HandlerFunc(fansHandler.List))).Methods("GET")
-	//router.Handle("/api/fan/add/", middleware.AuthMiddleware(http.HandlerFunc(fansHandler.Add))).Methods("POST")
-	//router.Handle("/api/fan/{id}/detail/", middleware.AuthMiddleware(http.HandlerFunc(fansHandler.Detail))).Methods("GET")
-	//router.Handle("/api/fan/{id}/detail/", middleware.AuthMiddleware(http.HandlerFunc(fansHandler.Detail))).Methods("POST")
-	//router.Handle("/api/fan/{id}/detail/", middleware.AuthMiddleware(http.HandlerFunc(fansHandler.Detail))).Methods("DELETE")
-
-	//// room endpoinds
-	//router.Handle("/api/room/{id}/detail/", middleware.AuthMiddleware(http.HandlerFunc(roomHandler.Detail))).Methods("DELETE")
-	//router.Handle("/api/room/list/", middleware.AuthMiddleware(http.HandlerFunc(roomHandler.List))).Methods("GET")
-	//router.Handle("/api/room/add/", middleware.AuthMiddleware(http.HandlerFunc(roomHandler.Add))).Methods("POST")
-	//router.Handle("/api/room/{id}/detail/", middleware.AuthMiddleware(http.HandlerFunc(roomHandler.Detail))).Methods("GET")
-	//router.Handle("/api/room/{id}/detail/", middleware.AuthMiddleware(http.HandlerFunc(roomHandler.Detail))).Methods("POST")
-	//router.Handle("/api/room/{id}/detail/", middleware.AuthMiddleware(http.HandlerFunc(roomHandler.Detail))).Methods("DELETE")
+	router.Handle("/api/pin/on/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinON))).Methods("POST")
+	router.Handle("/api/pin/off/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinOFF))).Methods("POST")
+	router.Handle("/api/pin/status/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinStatus))).Methods("GET")
+	router.Handle("/api/temperature-sensor/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.ReadTemperature))).Methods("GET")
 
 	http.ListenAndServe(":8080", router)
 }

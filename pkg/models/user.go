@@ -1,9 +1,11 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 // User represents the User
-// with a Name, Surname, Password, isAuthenticated
+// with Username, Password, isAuthenticated
 type User struct {
 	gorm.Model
 
