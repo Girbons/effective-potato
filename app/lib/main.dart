@@ -1,3 +1,4 @@
+import 'package:app/add_light.dart';
 import 'package:app/lights_page.dart';
 import 'package:app/settings_page.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ class MyApp extends StatelessWidget {
   final routes = <String, WidgetBuilder>{
     LoginPage.tag: (context) => LoginPage(),
     LightsPage.tag: (context) => LightsPage(),
+    LightAddPage.tag: (context) => LightAddPage(),
     SettingsPage.tag: (context) => SettingsPage(),
   };
 

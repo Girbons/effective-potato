@@ -69,3 +69,53 @@ void turnOff(int pin) async {
 void saveGateway(String value) async {
   storage.write(key: "gatewayIP", value: value);
 }
+
+void addLight(String name, pin) async {
+  var baseURL = await getGatewayAddress();
+  var token = await storage.read(key: "token");
+
+  var body = json.encode({
+    "name": name,
+    "pin": int.parse(pin)
+  });
+
+  var turnOnEndpoint = baseURL + "/api/lights/add/";
+  await http.post(turnOnEndpoint, body: body, headers: {
+    "Authorization": "$token",
+    "Content-Type": "application/json",
+  });
+}
+
+void lightDetail(int id) async {
+  var baseURL = await getGatewayAddress();
+  var token = await storage.read(key: "token");
+
+  var turnOnEndpoint = baseURL + "/api/lights/$id/detail";
+  await http.get(turnOnEndpoint, headers: {
+    "Authorization": "$token",
+    "Content-Type": "application/json",
+  });
+}
+
+void lightDelete(int id) async {
+  var baseURL = await getGatewayAddress();
+  var token = await storage.read(key: "token");
+
+  var turnOnEndpoint = baseURL + "/api/lights/$id/detail";
+  await http.delete(turnOnEndpoint, headers: {
+    "Authorization": "$token",
+    "Content-Type": "application/json",
+  });
+}
+
+Future<String> fetchLights() async {
+  var baseURL = await getGatewayAddress();
+  var token = await storage.read(key: "token");
+
+  var turnOnEndpoint = baseURL + "/api/lights/list/";
+  var response = await http.get(turnOnEndpoint, headers: {
+    "Authorization": "$token",
+    "Content-Type": "application/json",
+  });
+  return response.body;
+}

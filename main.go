@@ -35,12 +35,20 @@ func main() {
 	}
 	defer rpio.Close()
 
+	lightHandler := handler.NewLightHandler(db)
+
 	router := mux.NewRouter()
 	// user endpoints
 	router.HandleFunc("/login/", userHandlers.Login).Methods("POST")
 	router.HandleFunc("/logout/", userHandlers.Logout).Methods("POST")
 	router.Handle("/user/profile/", middleware.AuthMiddleware(http.HandlerFunc(userHandlers.Profile))).Methods("GET")
 
+	// light endpoints
+	router.Handle("/api/lights/add/", middleware.AuthMiddleware(http.HandlerFunc(lightHandler.Add))).Methods("POST")
+	router.Handle("/api/lights/list/", middleware.AuthMiddleware(http.HandlerFunc(lightHandler.List))).Methods("GET")
+	router.Handle("/api/lights/{id}/detail/", middleware.AuthMiddleware(http.HandlerFunc(lightHandler.Detail))).Methods("GET", "POST", "DELETE")
+
+	// pin endpoints
 	router.Handle("/api/pin/on/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinON))).Methods("GET")
 	router.Handle("/api/pin/off/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinOFF))).Methods("GET")
 	router.Handle("/api/pin/status/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinStatus))).Methods("GET")

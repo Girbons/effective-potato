@@ -14,6 +14,7 @@ class _SettingsPageState extends State<SettingsPage> {
   final _gatewatyController = TextEditingController();
   int _selectedIndex = 1;
 
+  @override
   void dispose() {
     _gatewatyController.dispose();
     super.dispose();
@@ -24,6 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
     _gatewatyController.text = baseURL;
   }
 
+  @override
   void initState() {
     setInitialValue();
 
