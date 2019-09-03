@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 
 class LoginPage extends StatefulWidget {
-  static String tag = 'login-page';
+  static String tag = "login-page";
 
   @override
   _LoginPageState createState() => new _LoginPageState();
@@ -14,34 +14,41 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _gatewayController = TextEditingController();
 
-  void checkToken() async {
-  }
 
   void initState() {
-    super.initState();
-    storage.deleteAll();
-
     ()async {
       var token = await storage.read(key: 'token');
-      if (token.length != 0) {
+      var responseStatusCode = await getUserProfile();
+
+      if (token.length != 0 && responseStatusCode != 401) {
         Navigator.push(context, MaterialPageRoute(builder: (context) => LightsPage()));
       }
     }();
+
+    super.initState();
   }
 
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
+    _gatewayController.dispose();
+
+    super.dispose();
   }
 
   bool _buttonDisabled() {
-    if (_usernameController.text == '') {
+    if (_usernameController.text == "") {
       return true;
     }
 
-    if (_passwordController.text == ''){
+    if (_passwordController.text == "") {
        return true;
+    }
+
+    if (_gatewayController.text == "") {
+      return true;
     }
 
     return false;
@@ -54,12 +61,23 @@ class _LoginPageState extends State<LoginPage> {
       textAlign: TextAlign.center,
     );
 
+    final gateway = TextFormField(
+      controller: _gatewayController,
+      keyboardType: TextInputType.text,
+      autofocus: false,
+      decoration: InputDecoration(
+        hintText: "http://192.168.1.10:8080",
+        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
+      )
+    );
+
     final username = TextFormField(
       controller: _usernameController,
       keyboardType: TextInputType.text,
       autofocus: false,
       decoration: InputDecoration(
-        hintText: 'username',
+        hintText: "username",
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       )
@@ -70,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
       autofocus: false,
       obscureText: true,
       decoration: InputDecoration(
-        hintText: 'password',
+        hintText: "password",
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       )
@@ -86,6 +104,7 @@ class _LoginPageState extends State<LoginPage> {
           if (_buttonDisabled()) {
             return null;
           }
+          saveGateway(_gatewayController.text);
           Future<int> result = login(_usernameController.text, _passwordController.text);
           result.then((value) => {
             if (value == 200) {
@@ -96,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
         },
         padding: EdgeInsets.all(12),
         color: Colors.lightBlueAccent,
-        child: Text('Log In', style: TextStyle(color: Colors.white)),
+        child: Text("Log In", style: TextStyle(color: Colors.white)),
       ),
     );
 
@@ -109,6 +128,8 @@ class _LoginPageState extends State<LoginPage> {
           children: <Widget>[
             textLogo,
             SizedBox(height: 50.0),
+            gateway,
+            SizedBox(height: 10.0),
             username,
             SizedBox(height: 8.0),
             password,

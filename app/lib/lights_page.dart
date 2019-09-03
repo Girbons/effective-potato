@@ -1,3 +1,5 @@
+import 'package:app/requests.dart';
+import 'package:app/settings_page.dart';
 import 'package:flutter/material.dart';
 
 class LightsPage extends StatefulWidget {
@@ -9,19 +11,25 @@ class LightsPage extends StatefulWidget {
 
 class _LightsPageState extends State<LightsPage> {
   static String tag = 'lights-page';
+  int _selectedIndex = 0;
 
   List<Map> lights = [
-    { 'key': 1, 'name': 'Room 1', 'status': false,},
-    { 'key': 2, 'name': 'Room 2', 'status': false},
-    { 'key': 3, 'name': 'Room 3', 'status': false},
-    { 'key': 4, 'name': 'Room 4', 'status': false},
+    { 'key': 1, 'name': 'Room 1', 'status': false, 'pin': 10},
+    { 'key': 2, 'name': 'Room 2', 'status': false, 'pin': 14},
+    { 'key': 3, 'name': 'Room 3', 'status': false, 'pin': 12},
   ];
+
+  void _onItemTapped(int index) {
+    if (index == 1) {
+      Navigator.of(context).pushNamed(SettingsPage.tag);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Home"),
+        title: Text("Lights"),
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
       ),
@@ -38,7 +46,7 @@ class _LightsPageState extends State<LightsPage> {
                   child: Text(
                     lights[index]['name'], 
                     style: TextStyle(fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.justify,),
+                    textAlign: TextAlign.justify),
                 ),
                 Expanded(
                   child: Container(
@@ -47,18 +55,37 @@ class _LightsPageState extends State<LightsPage> {
                     value: lights[index]['status'], 
                     onChanged: (bool value) {
                       setState(() {
+                        if (value) {
+                          turnOn(lights[index]['pin']);
+                        } else {
+                          turnOff(lights[index]['pin']);
+                        }
+
                         lights[index]['status'] = value;
                       });
-
                     }
                   ),
-                  )
+                 )
                 ),
               ],
             )
           );
         }
-      )
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            title: Text('Home'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            title: Text('Settings'),
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+      ),
     );
   }
 }
