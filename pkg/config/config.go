@@ -9,8 +9,13 @@ import (
 
 var conf *PotatoConfig
 
+// PotatoConfig represents the Potato Configuration
 type PotatoConfig struct {
-	JWTSigningKey string        `mapstructure:"jwt_signing_key"`
+
+	// JWTSigningKey is the key used to sign the JWT
+	JWTSigningKey string `mapstructure:"jwt_signing_key"`
+
+	// JWTExpiration defines the JWT validaiton
 	JWTExpiration time.Duration `mapstructure:"jwt_expiration"`
 }
 
@@ -22,6 +27,7 @@ func init() {
 	viper.SetDefault("jwt_expiration", 24)
 }
 
+// loadConfig reads the configuration file
 func (p *PotatoConfig) loadConfig() (*PotatoConfig, error) {
 	if err := viper.ReadInConfig(); err != nil {
 		log.Error(err)

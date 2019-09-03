@@ -14,10 +14,12 @@ import (
 )
 
 func main() {
+	// used to create the admin user
 	createAdminUser := flag.Bool("create-admin-user", false, "Create Admin user")
-	adminPassword := flag.String("admin-password", "dev123456", "choose admin password")
+	adminPassword := flag.String("admin-password", "123456", "choose admin password")
 	flag.Parse()
 
+	// initialize database
 	db := config.InitDB()
 	defer db.Close()
 
@@ -37,11 +39,10 @@ func main() {
 	// user endpoints
 	router.HandleFunc("/login/", userHandlers.Login).Methods("POST")
 	router.HandleFunc("/logout/", userHandlers.Logout).Methods("POST")
+	router.Handle("/user/profile/", middleware.AuthMiddleware(http.HandlerFunc(userHandlers.Profile))).Methods("GET")
 
-	router.Handle("/api/user/add/", middleware.AuthMiddleware(http.HandlerFunc(userHandlers.AddUser))).Methods("POST")
-
-	router.Handle("/api/pin/on/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinON))).Methods("POST")
-	router.Handle("/api/pin/off/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinOFF))).Methods("POST")
+	router.Handle("/api/pin/on/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinON))).Methods("GET")
+	router.Handle("/api/pin/off/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinOFF))).Methods("GET")
 	router.Handle("/api/pin/status/{pin:[0-9]+}/", middleware.AuthMiddleware(http.HandlerFunc(handler.PinStatus))).Methods("GET")
 	router.Handle("/api/temperature-sensor/{pin:[0-9]+}/{dht}/", middleware.AuthMiddleware(http.HandlerFunc(handler.ReadTemperature))).Methods("GET")
 

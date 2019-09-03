@@ -8,9 +8,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
+// AuthMiddleware is used for protected endpoints.
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
 		tokenString := r.Header.Get("Authorization")
 		if len(tokenString) == 0 {
 			w.WriteHeader(http.StatusUnauthorized)

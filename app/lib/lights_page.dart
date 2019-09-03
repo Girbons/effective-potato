@@ -15,8 +15,7 @@ class _LightsPageState extends State<LightsPage> {
 
   List<Map> lights = [
     { 'key': 1, 'name': 'Room 1', 'status': false, 'pin': 10},
-    { 'key': 2, 'name': 'Room 2', 'status': false, 'pin': 14},
-    { 'key': 3, 'name': 'Room 3', 'status': false, 'pin': 12},
+    { 'key': 2, 'name': 'Room 2', 'status': false, 'pin': 18},
   ];
 
   void _onItemTapped(int index) {

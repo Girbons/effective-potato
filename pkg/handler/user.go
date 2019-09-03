@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -29,53 +30,42 @@ func (user *UserHandler) CreateAdminUser(password string) {
 	fmt.Println("Admin user correctly created")
 }
 
-// AddUserHandler takes care of creating a new user given `username` and `password`
-func (user *UserHandler) AddUser(w http.ResponseWriter, r *http.Request) {
+func (user *UserHandler) Profile(w http.ResponseWriter, r *http.Request) {
 	var u models.User
 
-	params := r.URL.Query()
+	username := r.Header.Get("username")
+	user.db.Where("username = ?", username).First(&u)
 
-	username := params.Get("username")
-	password := params.Get("password")
+	result, _ := json.Marshal(u)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(result)
+}
 
-	if username == "" || password == "" {
-		respondWithError(w, http.StatusBadRequest, "provide username and password")
-	} else {
-
-		// here we hash the password and we drop it
-		// we won't save the password in plain text OFC
-		hash, _ := auth.HashPassword(password)
-
-		user.db.Where(&models.User{Username: "admin", Password: hash}).FirstOrCreate(&u)
-		respondWithJSON(w, http.StatusCreated, "user correctly created")
-	}
+type IntUser struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 // Login takes care to check if a User can login
 func (user *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var u models.User
+	var us IntUser
 	var count int
 
-	params := r.URL.Query()
+	json.NewDecoder(r.Body).Decode(&us)
 
-	username := params.Get("username")
-	password := params.Get("password")
-
-	if username == "" || password == "" {
-		respondWithError(w, http.StatusBadRequest, "provide username and password")
-	}
-
-	user.db.Where("username = ?", username).First(&u).Count(&count)
+	user.db.Where("username = ?", us.Username).First(&u).Count(&count)
 	if count == 0 {
 		respondWithError(w, http.StatusBadRequest, "invalid username or password")
 	}
 
-	hash, _ := auth.HashPassword(password)
-	if ok := auth.CheckPasswordHash(password, hash); !ok {
+	hash, _ := auth.HashPassword(us.Password)
+	if ok := auth.CheckPasswordHash(us.Password, hash); !ok {
 		respondWithError(w, http.StatusBadRequest, "invalid username or password")
 	}
 
-	token, err := auth.GetToken(username)
+	token, err := auth.GetToken(us.Username)
 	if err != nil {
 		respondWithError(w, http.StatusBadRequest, "There was an error trying to generate JWT "+err.Error())
 	}

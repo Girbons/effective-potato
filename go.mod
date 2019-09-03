@@ -13,5 +13,5 @@ require (
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/viper v1.4.0
 	github.com/stianeikeland/go-rpio v4.2.0+incompatible
-	golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586
+	golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472
 )

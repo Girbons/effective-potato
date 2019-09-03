@@ -10,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// GetToken returns the JWT,
 func GetToken(username string) (string, error) {
 	conf, err := config.GetConf()
 
@@ -17,6 +18,7 @@ func GetToken(username string) (string, error) {
 		log.Error(err)
 	}
 
+	// generate Token
 	signingKey := []byte(conf.JWTSigningKey)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"username": username,
@@ -27,6 +29,7 @@ func GetToken(username string) (string, error) {
 	return tokenString, err
 }
 
+// VerifiyToken checks that the token is a valid one.
 func VerifyToken(tokenString string) (jwt.Claims, error) {
 	conf, err := config.GetConf()
 

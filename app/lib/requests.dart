@@ -23,7 +23,6 @@ Future<int> login(String username, password) async {
     body: body
   );
   var parsedResponse = jsonDecode(response.body);
-  print(response.request.url);
   storage.write(key: "token", value: parsedResponse["token"]);
 
   return response.statusCode;
@@ -39,7 +38,7 @@ void turnOn(int pin) async {
 
   var turnOnEndpoint = baseURL + "/api/pin/on/$pin/";
   await http.get(turnOnEndpoint, headers: {
-    HttpHeaders.authorizationHeader: "$token",
+    "Authorization": "$token",
     "Content-Type": "application/json",
   });
 }

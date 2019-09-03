@@ -1,6 +1,6 @@
 # Effective Potato
 
-Expose a REST API to handle raspberry GPIO pin.
+Expose a REST API to handle raspberry GPIO.
 
 ## Getting Started
 
@@ -46,6 +46,10 @@ flutter build [ios/android]
 
 flutter install
 ```
+
+Default Credentials to login:
+ - username: 'admin'
+ - password: '123456'
 
 <table>
    <tr>
