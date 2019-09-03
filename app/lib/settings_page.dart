@@ -1,4 +1,5 @@
 import 'package:app/lights_page.dart';
+import 'package:app/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:app/requests.dart';
 
@@ -27,6 +28,11 @@ class _SettingsPageState extends State<SettingsPage> {
     setInitialValue();
 
     super.initState();
+  }
+
+  void _logout() {
+    logout();
+    Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
   void _onItemTapped(int index) {
@@ -71,7 +77,7 @@ class _SettingsPageState extends State<SettingsPage> {
     final logoutButton = Padding(
       padding: EdgeInsets.symmetric(vertical: 16.0),
       child: RaisedButton(
-        onPressed: () => logout(),
+        onPressed: _logout,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(24),
         ),
