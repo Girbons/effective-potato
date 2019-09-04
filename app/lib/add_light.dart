@@ -1,5 +1,4 @@
 import 'package:app/lights_page.dart';
-import 'package:app/requests.dart';
 import 'package:flutter/material.dart';
 
 class LightAddPage extends StatefulWidget {
@@ -23,7 +22,6 @@ class _LightAddPageState extends State<LightAddPage> {
 
   void _add() {
     if (_nameController.text.length != 0 && _pinController.text.length != 0){
-      addLight(_nameController.text, _pinController.text);
       Navigator.push(context, MaterialPageRoute(builder: (context) => LightsPage()));
     }
   }
